@@ -3,7 +3,6 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.schema import MetaData
 import zope.sqlalchemy
-from .node import Node
 
 NAMING_CONVENTION = {
     "ix": 'ix_%(column_0_label)s',
@@ -16,6 +15,8 @@ NAMING_CONVENTION = {
 metadata = MetaData(naming_convention=NAMING_CONVENTION)
 Base = declarative_base(metadata=metadata)
 
+from .node import Node
+from .folder import Folder
 
 def get_session(transaction_manager, dbmaker):
     dbsession = dbmaker()

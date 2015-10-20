@@ -1,21 +1,18 @@
 import os
 import sys
 import transaction
-
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
 )
-
 from pyramid.scripts.common import parse_vars
-
 from ..models import (
     Base,
     get_session,
     get_engine,
     get_dbmaker,
 )
-from ..models.node import Node
+from ..models.folder import RootFolder, Folder
 
 
 def usage(argv):
@@ -41,5 +38,10 @@ def main(argv=sys.argv):
     Base.metadata.create_all(engine)
 
     with transaction.manager:
-        model = Node()
-        dbsession.add(model)
+        root = RootFolder(name='',
+                          title='sqltraversal Demo'
+                          )
+        dbsession.add(root)
+        root['f1'] = Folder(
+            title='Folder 1'
+        )

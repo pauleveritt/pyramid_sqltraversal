@@ -1,5 +1,4 @@
 from pyramid.config import Configurator
-
 from .models.node import root_factory
 
 

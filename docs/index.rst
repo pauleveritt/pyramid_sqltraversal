@@ -4,7 +4,7 @@ Welcome to pyramid_sqltraversal documentation!
 Contents:
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
 
     setup/index
     simple_traversal/index
