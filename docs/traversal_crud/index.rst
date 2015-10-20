@@ -18,4 +18,8 @@ Traversal CRUD
 
 - Add static and templates
 
-- Small changes to initialize and views
+- Small changes to initialize
+
+- Views refactored to serve HTML from jinja2 templates
+
+- __init__ includes pyramid_jinja2 and add static view
