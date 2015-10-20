@@ -1,18 +1,19 @@
-====================
-Parents in One Query
-====================
+====
+ACLs
+====
 
-- Change node.py to add back the recursive CTE
+- This is the switch to PG
 
-- Change views and templates to use it
+- Data structure for setting and getting ACLs in the database
 
-    - Get rid of view.parents and the call to lineage
+- Ignore hierarchical ACLs and permission filtering on query results
 
-    - In template, use context.lineage | reverse
+- Ignore mutability
+
+- Add in authentication and authorization, to prove the framework is
+  working
+
+- Perhaps have a filtered children using Pyramid has_permission
 
 To Do
 =====
-
-- At this point, probably time to start thinking about synthesizing
-  huge data sets, bulk loading, then measuring some PG query planner
-  time

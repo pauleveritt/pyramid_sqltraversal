@@ -14,6 +14,7 @@ class RootViews:
 
     @view_config(renderer='templates/root.jinja2', context=RootFolder)
     def view(self):
+        print ('acl', self.context.__acl__)
         return dict(children=self.context.children)
 
     @view_config(name='delete')
@@ -31,6 +32,7 @@ class FolderViews:
     @view_config(renderer="templates/folder.jinja2",
                  context=Folder)
     def view(self):
+        print ('acl', self.context.__acl__)
         return dict(children=self.context.children)
 
     @view_config(name="add_folder", context=Folder)

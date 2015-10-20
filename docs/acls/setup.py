@@ -7,6 +7,7 @@ requires = [
     'SQLAlchemy',
     'transaction',
     'zope.sqlalchemy',
+    'psycopg2',
     'waitress',
     'nose',
     'webtest'

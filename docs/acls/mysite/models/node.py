@@ -12,6 +12,7 @@ from sqlalchemy.orm import (
     object_session,
     aliased
 )
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.util import classproperty
 from . import Base
@@ -32,6 +33,7 @@ class Node(Base):
         backref=backref('parent', remote_side=[id])
     )
     type = Column(String(50))
+    acl = Column(JSONB)
 
     @property
     def session(self):
@@ -97,3 +99,9 @@ class Node(Base):
     @property
     def all(self):
         return self.session.query(self.__class__)
+
+    @property
+    def __acl__(self):
+        # Later, use some trickeration to get the class acl without
+        # resorting to polymorphism
+        return self.acl

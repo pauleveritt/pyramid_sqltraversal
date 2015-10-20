@@ -40,7 +40,8 @@ def main(argv=sys.argv):
 
     with transaction.manager:
         root = RootFolder(name='',
-                          title='sqltraversal Demo'
+                          title='sqltraversal Demo',
+                          acl=[1, 2, 3]
                           )
         dbsession.add(root)
         f1 = root['f1'] = Folder(
