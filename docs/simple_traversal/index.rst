@@ -31,9 +31,11 @@ For example:
         __tablename__ = 'folders'
         id = Column(Integer, primary_key=True)
         parent_id = Column(Integer, ForeignKey('folders.id'))
-        children = relationship("Node",
-                                backref=backref('parent', remote_side=[id])
-                                )
+        children = relationship(
+            "Node",
+            lazy='dynamic',
+            backref=backref('parent', remote_side=[id])
+        )
 
 In this, a Folder stores its ``id`` but also can store a "parent", thus
 recording a ``parent_id``. You can ask a folder for its parent or for
@@ -61,9 +63,11 @@ of our types:
         id = Column(Integer, primary_key=True)
         name = Column(Unicode(50), nullable=False)
         parent_id = Column(Integer, ForeignKey('nodes.id'))
-        children = relationship("Node",
-                                backref=backref('parent', remote_side=[id])
-                                )
+        children = relationship(
+            "Node",
+            lazy='dynamic',
+            backref=backref('parent', remote_side=[id])
+        )
         type = Column(String(50))
 
     class Folder(Node):
@@ -108,11 +112,88 @@ Let's take a look at this base model ``Node`` in ``models/node.py``:
 
 We make a base model with a number of columns, each requiring imports
 from SQLAlchemy. This base ``Node`` implements the adjacency list
-relationship and polymorphism discussed above.
+relationship and polymorphism discussed above. ``Node`` then implements
+some methods:
 
+- A ``session`` property which provides a convenient way for a model
+  object to grab the session
+
+- The ``__mapper_args__`` needed for polymorphism
+
+- Python ``__setitem__`` and __getitem__`` dictionary behaviour used
+  by Pyramid traversal
+
+- The ``__name__`` and ``__parent__`` for Pyramid location-awareness
+
+As one more note on ``node.py``, we also moved the root factory in
+here. It is easy to get the root: just look for a row that has no
+``parent_id``.
+
+Our ``folder.py`` is super-simple:
+
+.. literalinclude:: mysite/models/folder.py
+    :caption: mysite/models/folder.py
+    :linenos:
+
+A SQLAlchemy model that inherits from our base ``Node`` model. You have
+to give the (plural) name of the table, provide the id as a foreign
+key, and any other columns unique to Folder. In our case, ``title``.
+For fun, we also make a ``RootFolder`` type, just in case our views
+want to render that resource differently.
 
 Things that could be better:
 
 - *After Base*. Surely there's a smarter approach to avoid that caveat.
   Perhaps the imports of ``Node`` and ``Folder`` should happen inside
-   the ``includeme``?
+  the ``includeme``?
+
+- *Resource-wide common attributes*. Perhaps in your system, everything
+  has a ``title``. You can just extend the base ``Node`` to add more in
+  that table. It's not just a code simplification: in some queries
+  which we'll see later, we'll turn off polymorphism and only look at
+  the ``Node`` table and its indexes.
+
+Initialize
+==========
+
+The initialize script isn't too different:
+
+.. literalinclude:: mysite/scripts/initialize_db.py
+    :caption: mysite/scripts/initialize_db.py
+    :emphasize-lines: 40-47
+    :linenos:
+
+We make the root folder, then use normal Python dictionary assignment
+to add a subfolder.
+
+Views
+=====
+
+Our views are still simple, but we put in a small trick:
+
+.. literalinclude:: mysite/views.py
+    :caption: mysite/views.py
+    :emphasize-lines: 12, 14, 15, 18
+    :linenos:
+
+We have one view that matches when the context is a ``RootFolder`` and
+another when the context is a ``Folder``.
+
+Note the absence of routes. Pyramid is usually configured to map URLs
+to views using routes, but can also use traversal. Once the Pyramid
+application gets a root object from the root factory, it can hop
+through the URL segments doing dictionary access. That's why we set up
+``__getitem__`` on the ``Node`` model.
+
+.. note::
+
+    Yes, it means a separate SQL query per hop. These are cheap
+    queries. Also, there are ways to do traversal all in one query,
+    which we might look at later.
+
+Conclusion
+==========
+
+We already have a pretty awesome system. No routes, we have
+containment, things can be added inside things. Let's build a little
+bit bigger system, then start doing some of the hard stuff.

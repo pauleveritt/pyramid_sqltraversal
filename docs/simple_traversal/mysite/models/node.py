@@ -3,19 +3,17 @@ from sqlalchemy import (
     Integer,
     Unicode,
     ForeignKey,
-    String,
-    literal
+    String
 )
 from sqlalchemy.orm import (
     relationship,
     backref,
-    object_session,
-    aliased
+    object_session
 )
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.util import classproperty
-
 from . import Base
+
 
 def root_factory(request):
     return request.dbsession.query(Node).filter_by(parent_id=None).one()
@@ -26,9 +24,11 @@ class Node(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(50), nullable=False)
     parent_id = Column(Integer, ForeignKey('nodes.id'))
-    children = relationship("Node",
-                            backref=backref('parent', remote_side=[id])
-                            )
+    children = relationship(
+        "Node",
+        lazy='dynamic',
+        backref=backref('parent', remote_side=[id])
+    )
     type = Column(String(50))
 
     @property
@@ -53,15 +53,11 @@ class Node(Base):
         session.flush()
 
     def __getitem__(self, key):
-        session = self.session
         try:
-            return session.query(Node).filter_by(
-                name=key, parent=self).one()
+            return self.children.filter_by(name=key, parent=self).one()
+
         except NoResultFound:
             raise KeyError(key)
-
-    def values(self):
-        return self.session.query(Node).filter_by(parent=self)
 
     @property
     def __name__(self):
@@ -70,13 +66,3 @@ class Node(Base):
     @property
     def __parent__(self):
         return self.parent
-
-    @property
-    def all(self):
-        return self.session.query(self.__class__)
-
-
-sample_data = [
-    dict(),
-    dict()
-]
