@@ -43,7 +43,9 @@ Things that could be better:
 
 - *Unit and functional tests*. I didn't actually write any. Not only
   that, sure would be nice for some ``pyramid_sqltraversal`` library
-  to provide some fixture helpers.
+  to provide some fixture helpers. Could look at `this commit
+  <https://github.com/Pylons/pyramid/commit
+  /411eecbedc54d425efa1b03d70f084023e71b6f7>`_ for some inspiration.
 
 ``development.ini``
 ===================

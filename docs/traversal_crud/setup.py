@@ -3,6 +3,7 @@ from setuptools import setup
 requires = [
     'pyramid',
     'pyramid_tm',
+    'pyramid_jinja2',
     'SQLAlchemy',
     'transaction',
     'zope.sqlalchemy',

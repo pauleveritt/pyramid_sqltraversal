@@ -1,14 +1,11 @@
 import os
 import sys
 import transaction
-
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
 )
-
 from pyramid.scripts.common import parse_vars
-
 from ..models import (
     Base,
     get_session,
@@ -49,4 +46,4 @@ def main(argv=sys.argv):
         f1 = root['f1'] = Folder(
             title='Folder 1'
         )
-        f1['da'] = Document(title='Document 1A')
+        f1['d1'] = Document(title='Document 1')

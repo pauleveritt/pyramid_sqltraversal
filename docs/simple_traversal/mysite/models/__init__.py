@@ -18,6 +18,7 @@ Base = declarative_base(metadata=metadata)
 from .node import Node
 from .folder import Folder
 
+
 def get_session(transaction_manager, dbmaker):
     dbsession = dbmaker()
     zope.sqlalchemy.register(dbsession,

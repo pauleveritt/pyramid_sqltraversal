@@ -153,6 +153,9 @@ Things that could be better:
   which we'll see later, we'll turn off polymorphism and only look at
   the ``Node`` table and its indexes.
 
+- *Indexes*. Are there any indexes we need for any of the stuff in
+  ``Node``?
+
 Initialize
 ==========
 

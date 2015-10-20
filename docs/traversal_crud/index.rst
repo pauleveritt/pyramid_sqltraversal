@@ -4,8 +4,18 @@ Traversal CRUD
 
 - Copy everything from Quick Traversal final chapter
 
-- Polymorphism
+- setup.py
 
-- Adjacency list pattern
+    - Add in pyramid_jinja2
 
-- Lineage as a CTE
+- development.ini
+
+    - pyramid.reload_templates
+
+- models
+
+    - document.py
+
+- Add static and templates
+
+- Small changes to initialize and views
