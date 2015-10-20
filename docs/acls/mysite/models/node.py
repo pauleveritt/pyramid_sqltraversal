@@ -104,4 +104,4 @@ class Node(Base):
     def __acl__(self):
         # Later, use some trickeration to get the class acl without
         # resorting to polymorphism
-        return self.acl
+        return getattr(self, 'acl', None) or self.__class__.default_acl

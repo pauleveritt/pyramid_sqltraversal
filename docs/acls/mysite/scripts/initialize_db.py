@@ -5,6 +5,7 @@ from pyramid.paster import (
     get_appsettings,
     setup_logging,
 )
+from pyramid.security import Allow, Everyone
 from pyramid.scripts.common import parse_vars
 from ..models import (
     Base,
@@ -40,8 +41,7 @@ def main(argv=sys.argv):
 
     with transaction.manager:
         root = RootFolder(name='',
-                          title='sqltraversal Demo',
-                          acl=[1, 2, 3]
+                          title='sqltraversal Demo'
                           )
         dbsession.add(root)
         f1 = root['f1'] = Folder(
