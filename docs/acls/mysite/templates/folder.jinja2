@@ -1,0 +1,6 @@
+{% extends "base.jinja2" %}
+{% block title %}{{ context.title }}{% endblock %}
+{% block content %}
+    <h2>Folder - {{ context.title }}</h2>
+    {% include "templates/contents.jinja2" %}
+{% endblock %}

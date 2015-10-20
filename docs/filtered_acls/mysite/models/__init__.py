@@ -15,15 +15,10 @@ NAMING_CONVENTION = {
 metadata = MetaData(naming_convention=NAMING_CONVENTION)
 Base = declarative_base(metadata=metadata)
 
-from .node import Node
-from .folder import Folder
-from .document import Document
-
 
 def get_session(transaction_manager, dbmaker):
     dbsession = dbmaker()
-    zope.sqlalchemy.register(dbsession,
-                             transaction_manager=transaction_manager)
+    zope.sqlalchemy.register(dbsession, transaction_manager=transaction_manager)
     return dbsession
 
 
@@ -37,6 +32,10 @@ def get_dbmaker(engine):
     return dbmaker
 
 
+
+from .node import Node
+from .folder import Folder
+from .document import Document
 def includeme(config):
     settings = config.get_settings()
     dbmaker = get_dbmaker(get_engine(settings))

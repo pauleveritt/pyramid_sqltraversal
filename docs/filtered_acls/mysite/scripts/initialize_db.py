@@ -1,11 +1,14 @@
 import os
 import sys
 import transaction
+
 from pyramid.paster import (
     get_appsettings,
     setup_logging,
 )
+
 from pyramid.scripts.common import parse_vars
+
 from ..models import (
     Base,
     get_session,
@@ -23,6 +26,32 @@ def usage(argv):
     sys.exit(1)
 
 
+def initialize(Base, engine, dbsession):
+    Base.metadata.drop_all(engine)
+    Base.metadata.create_all(engine)
+    with transaction.manager:
+        __acl__ = [
+            ['Allow', 'paul', 'read'],
+            ['Allow', 'jane', 'read'],
+            ['Allow', 'paul', 'write']
+        ]
+        root = RootFolder(name='',
+                          title='sqltraversal Demo 22',
+                          __acl__=__acl__
+                          )
+        dbsession.add(root)
+        f1 = root['f1'] = Folder(
+            title='Folder 1'
+        )
+        f1['da'] = Document(title='Document 1A')
+
+
+def playground(dbsession):
+    with transaction.manager:
+        root = dbsession.query(Folder).filter_by(parent_id=None).one()
+        print("result", root.__acl__[0][0])
+
+
 def main(argv=sys.argv):
     if len(argv) < 2:
         usage(argv)
@@ -36,14 +65,5 @@ def main(argv=sys.argv):
 
     dbsession = get_session(transaction.manager, dbmaker)
 
-    Base.metadata.create_all(engine)
-
-    with transaction.manager:
-        root = RootFolder(name='',
-                          title='sqltraversal Demo'
-                          )
-        dbsession.add(root)
-        f1 = root['f1'] = Folder(
-            title='Folder 1'
-        )
-        f1['d1'] = Document(title='Document 1')
+    initialize(Base, engine, dbsession)
+    playground(dbsession)

@@ -9,6 +9,7 @@ Contents:
     setup/index
     simple_traversal/index
     traversal_crud/index
+    parents/index
     acls/index
     notes
 

@@ -1,32 +1,18 @@
-====
-ACLs
-====
+====================
+Parents in One Query
+====================
 
-- Switch to PG for JSONB
+- Change node.py to add back the recursive CTE
 
-    - Single dimension
+- Change views and templates to use it
 
-        - Get a single item
+    - Get rid of view.parents and the call to lineage
 
-        - Set a single item
+    - In template, use context.lineage | reverse
 
-        - Item in array
+To Do
+=====
 
-        - Any item in one array, in another array
-
-        - Bind parameter
-
-    - Multi dimension
-
-        - Constants for permissions, Allow/Deny
-
-- Algorithm
-
-    -
-
-- Get testing working again
-
-- Replace ACL with CTE
-
-    - Hybrid attribute or column property
-
+- At this point, probably time to start thinking about synthesizing
+  huge data sets, bulk loading, then measuring some PG query planner
+  time

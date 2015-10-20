@@ -13,6 +13,14 @@ class Folder(Node):
     id = Column(Integer, ForeignKey('nodes.id'), primary_key=True)
     title = Column(Text)
 
+    def __json__(self, request):
+
+        return dict(
+            id=self.id,
+            title=self.title,
+            __acl__=self.__acl__,
+        )
+
 
 class RootFolder(Folder):
     pass

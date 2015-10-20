@@ -14,6 +14,8 @@ from sqlalchemy.orm import (
 )
 from sqlalchemy.orm.exc import NoResultFound
 from sqlalchemy.util import classproperty
+from sqlalchemy.dialects.postgresql import ARRAY
+
 from . import Base
 
 
@@ -26,12 +28,12 @@ class Node(Base):
     id = Column(Integer, primary_key=True)
     name = Column(Unicode(50), nullable=False)
     parent_id = Column(Integer, ForeignKey('nodes.id'))
-    children = relationship(
-        "Node",
-        lazy='dynamic',
-        backref=backref('parent', remote_side=[id])
-    )
+    children = relationship("Node",
+                            lazy='dynamic',
+                            backref=backref('parent', remote_side=[id])
+                            )
     type = Column(String(50))
+    __acl__ = Column(ARRAY(String, dimensions=2))
 
     @property
     def session(self):
@@ -55,11 +57,14 @@ class Node(Base):
         session.flush()
 
     def __getitem__(self, key):
+        session = self.session
         try:
-            return self.children.filter_by(name=key, parent=self).one()
-
+            return self.children.filter_by(name=key).one()
         except NoResultFound:
             raise KeyError(key)
+
+    def values(self):
+        return self.session.query(Node).filter_by(parent=self)
 
     @property
     def __name__(self):
@@ -97,3 +102,9 @@ class Node(Base):
     @property
     def all(self):
         return self.session.query(self.__class__)
+
+
+sample_data = [
+    dict(),
+    dict()
+]

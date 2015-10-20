@@ -3,13 +3,13 @@ from setuptools import setup
 requires = [
     'pyramid',
     'pyramid_tm',
-    'pyramid_jinja2',
-    'SQLAlchemy',
+#    'SQLAlchemy',
     'transaction',
     'zope.sqlalchemy',
     'waitress',
     'nose',
-    'webtest'
+    'webtest',
+    'psycopg2'
 ]
 setup(name='mysite',
       install_requires=requires,
