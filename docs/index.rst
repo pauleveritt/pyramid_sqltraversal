@@ -1,5 +1,5 @@
 Welcome to pyramid_sqltraversal documentation!
-====================================
+==============================================
 
 Contents:
 
@@ -7,6 +7,7 @@ Contents:
     :maxdepth: 2
 
     setup/index
+    simple_traversal/index
     traversal_crud/index
     acls/index
     notes
