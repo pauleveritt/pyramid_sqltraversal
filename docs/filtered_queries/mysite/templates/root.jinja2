@@ -1,0 +1,7 @@
+{% extends "base.jinja2" %}
+{% block title %}{{ context.title }}{% endblock %}
+{% block content %}
+    <h2>{{ context.title }}</h2>
+    <p>The root might have some other text.</p>
+    {% include "templates/contents.jinja2" %}
+{% endblock %}

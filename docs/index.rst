@@ -11,6 +11,7 @@ Contents:
     traversal_crud/index
     parents/index
     acls/index
+    filtered_children/index
     notes
 
 
