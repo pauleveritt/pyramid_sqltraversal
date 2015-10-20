@@ -20,10 +20,19 @@
           {{ request.root.title }}
         </a>
     </div>
-    <ul class="nav navbar-nav">
-        <li>
-        </li>
-    </ul>
+        <ul class="nav navbar-nav navbar-right">
+          {% if request.authenticated_userid %}
+              <li>
+                  <a href="{{ request.resource_url(request.root,
+                  'logout') }}">Logout</a>
+              </li>
+          {% else %}
+              <li>
+                  <a href="{{ request.resource_url(request.root, 'login')
+                      }}">Login</a>
+              </li>
+          {% endif %}
+        </ul>
 </nav>
 
 <div id="content" class="container">
