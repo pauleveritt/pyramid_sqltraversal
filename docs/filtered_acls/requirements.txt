@@ -1,1 +1,0 @@
--e git://github.com/zzzeek/sqlalchemy@rel_1_1#egg=sqlalchemy
