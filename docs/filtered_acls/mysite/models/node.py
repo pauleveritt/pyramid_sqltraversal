@@ -99,10 +99,6 @@ class Node(Base):
                 .order_by(lineage_cte.c.index))
         return q.all()
 
-    @property
-    def all(self):
-        return self.session.query(self.__class__)
-
 
 sample_data = [
     dict(),

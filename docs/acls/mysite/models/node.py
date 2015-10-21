@@ -97,10 +97,6 @@ class Node(Base):
         return q.all()
 
     @property
-    def all(self):
-        return self.session.query(self.__class__)
-
-    @property
     def __acl__(self):
         # Later, use some trickeration to get the class acl without
         # resorting to polymorphism

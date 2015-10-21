@@ -93,7 +93,3 @@ class Node(Base):
                 .join(lineage_cte, Node.id == lineage_cte.c.id)
                 .order_by(lineage_cte.c.index))
         return q.all()
-
-    @property
-    def all(self):
-        return self.session.query(self.__class__)
