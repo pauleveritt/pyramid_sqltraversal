@@ -5,7 +5,7 @@ from pyramid.paster import (
     get_appsettings,
     setup_logging,
 )
-from pyramid.security import Allow, Everyone
+from pyramid.security import Allow, Deny, Everyone
 from pyramid.scripts.common import parse_vars
 from ..models import (
     Base,
@@ -48,3 +48,12 @@ def main(argv=sys.argv):
             title='Folder 1'
         )
         f1['d1'] = Document(title='Document 1')
+
+        # Add a folder that only admin can view
+        root['f2'] = Folder(
+            title='Admin-only folder',
+            acl=[
+                (Allow, 'admin', 'view'),
+                (Deny, Everyone, 'view')
+            ]
+        )

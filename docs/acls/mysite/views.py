@@ -1,7 +1,7 @@
 from random import randint
 from pyramid.httpexceptions import HTTPFound
 from pyramid.view import view_config
-from pyramid.security import remember, forget, Allow, Everyone
+from pyramid.security import remember, forget
 from .models.folder import RootFolder, Folder
 from .models.document import Document
 from .security import USERS
@@ -58,19 +58,17 @@ class FolderViews:
 
     @view_config(renderer="templates/folder.jinja2",
                  context=Folder,
-                 permission='add')
+                 permission='view')
     def view(self):
         return dict(children=self.context.children)
 
-    @view_config(name="add_folder", context=Folder,
-                 permission='add')
+    @view_config(name="add_folder", context=Folder)
     def add(self):
         # Make a new Folder
         title = self.request.POST['folder_title']
         name = str(randint(0, 999999))
-        acl = []
 
-        new_folder = self.context[name] = Folder(title=title, acl=acl)
+        new_folder = self.context[name] = Folder(title=title)
 
         # Redirect to the new folder
         url = self.request.resource_url(new_folder)

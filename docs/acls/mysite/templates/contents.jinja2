@@ -3,6 +3,7 @@
 <div class="row">
     <ul class="list-group col-md-6">
       {% for child in context.children %}
+        {%  if request.has_permission('view', child) %}
           <li class="list-group-item">
 
               <a href="{{ request.resource_url(child) }}">
@@ -17,6 +18,7 @@
                   </a>
               </div>
           </li>
+        {%  endif %}
       {% endfor %}
     </ul>
 </div>
