@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+<head>
+    <title>{% block title %}{% endblock %} - MySite</title>
+    <link rel="stylesheet"
+          href="//oss.maxcdn.com/bootstrap/3.3.4/css/bootstrap.css">
+    <link rel="stylesheet"
+          href="{{ request.static_url('mysite:static/mysite.css') }}">
+    <link rel="shortcut icon"
+          href="request.static_url('mysite:static/pyramid-16x16.png')">
+</head>
+<body>
+
+<nav class="navbar navbar-inverse">
+    <div class="navbar-header">
+        <a class="navbar-brand"
+           href="{{ request.resource_url(request.root) }}">
+          {{ request.root.title }}
+        </a>
+    </div>
+    <ul class="nav navbar-nav">
+        <li>
+        </li>
+    </ul>
+</nav>
+
+<div id="content" class="container">
+    <ol class="breadcrumb">
+
+      {% for p in context.lineage|reverse %}
+          <li><a href="{{ request.resource_url(p) }}">{{ p.title }}</a>
+          </li>
+      {% endfor %}
+    </ol>
+  {% block content %}{% endblock %}
+</div>
+
+<script src="//oss.maxcdn.com/jquery/2.1.3/jquery.js"></script>
+</body>
+</html>

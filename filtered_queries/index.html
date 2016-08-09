@@ -1,0 +1,184 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Filtered Queries &mdash; pyramid_sqltraversal 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <link rel="top" title="pyramid_sqltraversal 0.0.1 documentation" href="../index.html" />
+    <link rel="next" title="Notes" href="../notes.html" />
+    <link rel="prev" title="ACLs" href="../acls/index.html" />
+   
+  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="filtered-queries">
+<h1>Filtered Queries<a class="headerlink" href="#filtered-queries" title="Permalink to this headline">¶</a></h1>
+<p>In our last example, we finished by security filtering the retrieved
+children using Pyramid&#8217;s <code class="docutils literal"><span class="pre">has_permission</span></code>. This works ok, but has
+some negatives:</p>
+<ul class="simple">
+<li>You have to get a bunch of objects back and then filter in Python, so
+you can&#8217;t use <code class="docutils literal"><span class="pre">LIMIT</span></code> at the SQL level</li>
+<li>If you&#8217;re going to be doing a richer SQLAlchemy query, you&#8217;d like to
+combine permission filtering with all the other clauses, to get the
+most efficient query, instead of bunches of queries to bring rows
+back into Python for further narrowing</li>
+</ul>
+<p>There are several hard things <code class="docutils literal"><span class="pre">pyramid_sqlalchemy</span></code> hopes to do. This
+is the first one. In this section, we&#8217;d like to add an &#8220;All Folders&#8221;
+link in the header. Clicking it will look through the entire hierarchy,
+showing the first 20 Folders, sorted by title.</p>
+<p>And, filtered by permission.</p>
+<div class="section" id="strategy">
+<h2>Strategy<a class="headerlink" href="#strategy" title="Permalink to this headline">¶</a></h2>
+<p>There are a few key points in this step:</p>
+<ul class="simple">
+<li><em>Permission filtering in SQL</em>. We can&#8217;t bring rows back to Python and
+let Pyramid pick them apart. If we have 100,000 folders, that&#8217;s
+100,000 queries.</li>
+<li><em>ACL parsing in SQL</em>. In a related sense, we need pure-SQL logic to
+take a sequence of principals and a permission, then analyze a JSONB
+structure of access control entries. When you find a match, stop
+looking and return allow or deny.</li>
+<li><em>Instance and class ACLs</em>. Most resources will <em>not</em> have a custom
+ACL on the resource. They&#8217;ll get their ACL from the model. That
+model-based ACL needs to get passed into the SQL query, presumably as
+a JSONB type.</li>
+<li><em>Recursion</em>. If you don&#8217;t find a matching ACE on a resource, keep
+looking up the parents. As part of the query, bailing out when you
+find a matching ACE.</li>
+<li><em>Natural and performant in SQLAlchemy</em>. We need permission filtering
+to combine with other parts of the query &#8211; filters, sorting, and
+especially limits &#8211; in a natural way. Not just natural, but
+performant.</li>
+</ul>
+<p>The approach attempted here is to use a SQLAlchemy hybrid method, and
+have the &#8220;expression&#8221; part construct a SQL statement. Then, combine
+this in some way with a recursive CTE that, for each node, looks at the
+parents.</p>
+<p>Some notes:</p>
+<ul class="simple">
+<li>This likely should be done in a way that only the <code class="docutils literal"><span class="pre">nodes</span></code> table is
+used. Thus, no polymorphism. We&#8217;ll have to get the class-based ACLs via
+reflection at startup, then find a way to make them available in the
+queries.</li>
+<li>Sure wish there was a way, during the execution of a query, to cache
+the ACL result on intermediate parent nodes. If you evaluate the
+hierarchical ACL for <code class="docutils literal"><span class="pre">/f1/f2/f3/doc1</span></code> during a query, when you then
+look at <code class="docutils literal"><span class="pre">/f1/f2/f3/doc2</span></code>, you know the answer for
+<code class="docutils literal"><span class="pre">/f1/f2/f3</span></code>.</li>
+<li>It really is critical for the optimizer to do all the other parts of
+a query, and kick in the limit on this part. Of course sorting then
+blows that out the window.</li>
+</ul>
+</div>
+<div class="section" id="to-do">
+<h2>To Do<a class="headerlink" href="#to-do" title="Permalink to this headline">¶</a></h2>
+<ul>
+<li><p class="first">Improve initialize_db to clear out all the tables and data before
+running, to save a dropdb createdb step</p>
+</li>
+<li><p class="first">Make an ACLType to consolidate all of this</p>
+</li>
+<li><p class="first">Simpler way to let the class provide a default ACL for the type/model</p>
+</li>
+<li><p class="first">Need to get the class-based ACLs coerced into the generated SQL</p>
+<blockquote>
+<div><p><a class="reference external" href="http://techspot.zzzeek.org/2011/10/29/value-agnostic-types-part-ii/">http://techspot.zzzeek.org/2011/10/29/value-agnostic-types-part-ii/</a></p>
+</div></blockquote>
+</li>
+</ul>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="../index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Filtered Queries</a><ul>
+<li><a class="reference internal" href="#strategy">Strategy</a></li>
+<li><a class="reference internal" href="#to-do">To Do</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="../acls/index.html" title="previous chapter">ACLs</a></li>
+      <li>Next: <a href="../notes.html" title="next chapter">Notes</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/filtered_queries/index.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2015, Paul Everitt.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.4.5</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="../_sources/filtered_queries/index.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

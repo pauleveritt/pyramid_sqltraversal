@@ -1,0 +1,50 @@
+<h4>Contents</h4>
+
+<div class="row">
+    <ul class="list-group col-md-6">
+      {% for child in context.children %}
+        {%  if request.has_permission('view', child) %}
+          <li class="list-group-item">
+
+              <a href="{{ request.resource_url(child) }}">
+                {{ child.title }}
+              </a>
+
+              <div class="btn-group  pull-right" role="group">
+                  <a class="btn btn-default btn-xs"
+                     href="{{ request.resource_url(child, 'delete') }}">
+                      <span class="glyphicon glyphicon-trash"
+                            aria-hidden="true"></span> delete
+                  </a>
+              </div>
+          </li>
+        {%  endif %}
+      {% endfor %}
+    </ul>
+</div>
+<div class="row">
+    <p>
+
+    <form class="form-inline"
+          action="{{ request.resource_url(context, 'add_folder') }}"
+          method="POST">
+        <div class="form-group">
+            <input class="form-control" name="folder_title"
+                   placeholder="New folder title..."/>
+        </div>
+        <input type="submit" class="btn" value="Add Folder"/>
+    </form>
+    </p>
+    <p>
+
+    <form class="form-inline"
+          action="{{ request.resource_url(context, 'add_document') }}"
+          method="POST">
+        <div class="form-group">
+            <input class="form-control" name="document_title"
+                   placeholder="New document title..."/>
+        </div>
+        <input type="submit" class="btn" value="Add Document"/>
+    </form>
+    </p>
+</div>
