@@ -25,9 +25,9 @@ tests_require = [
     'pytest-cov',
     ]
 
-setup(name='todos',
+setup(name='todolist',
       version='0.0',
-      description='todos',
+      description='todo list',
       long_description=README + '\n\n' + CHANGES,
       classifiers=[
           "Programming Language :: Python",
@@ -48,8 +48,8 @@ setup(name='todos',
       install_requires=requires,
       entry_points="""\
       [paste.app_factory]
-      main = todos:main
+      main = todolist:main
       [console_scripts]
-      initialize_todos_db = todos.scripts.initializedb:main
+      initialize_todos_db = todolist.scripts.initializedb:main
       """,
       )

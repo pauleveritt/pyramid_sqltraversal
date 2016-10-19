@@ -1,0 +1,14 @@
+{% extends "layout.jinja2" %}
+
+{% block content %}
+    <div class="content">
+        <h2>Todo List</h2>
+        <ul>
+            {% for todo in todos %}
+                <li>
+                    <a href="{{ request.route_url('todo_view', id=todo.id) }}">{{ todo.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endblock content %}
