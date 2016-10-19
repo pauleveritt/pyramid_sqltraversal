@@ -8,11 +8,11 @@ from sqlalchemy import (
 from .meta import Base
 
 
-class Todo(Base):
+class Todos(Base):
     __tablename__ = 'todos'
     id = Column(Integer, primary_key=True)
     name = Column(Text)
     value = Column(Integer)
 
 
-Index('my_index', Todo.name, unique=True, mysql_length=255)
+Index('my_index', Todos.name, unique=True, mysql_length=255)

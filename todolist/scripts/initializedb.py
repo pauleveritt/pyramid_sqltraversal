@@ -15,7 +15,7 @@ from ..models import (
     get_session_factory,
     get_tm_session,
 )
-from ..models import Todo
+from ..models import Todos
 
 
 def usage(argv):
@@ -41,5 +41,5 @@ def main(argv=sys.argv):
     with transaction.manager:
         dbsession = get_tm_session(session_factory, transaction.manager)
 
-        model = Todo(name='one', value=1)
+        model = Todos(name='one', value=1)
         dbsession.add(model)
